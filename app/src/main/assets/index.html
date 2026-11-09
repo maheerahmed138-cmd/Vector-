@@ -49,21 +49,36 @@
 <nav class="nav"><button class="active" data-go="home">⌂ Home</button><button data-go="goal">◎ Goal</button><button data-go="plan">▤ Plan</button><button data-go="study">◷ Study</button><button data-go="calendar">▦ Calendar</button><button data-go="progress">↗ Progress</button></nav>
 <section id="home" class="screen active"><div class="hero"><div class="tiny">YOUR MAIN GOAL</div><h1 id="hgoal">Set your main goal</h1><div class="count"><b id="left">—</b><span class="tiny">DAYS LEFT</span></div><div class="tiny" id="dateLabel" style="margin-top:8px">Add exam date in Goal</div></div><div class="grid"><div class="card"><div class="tiny">TODAY'S PLAN</div><div class="metric" id="hTasks">0 tasks</div><div class="tiny" id="hDone">No plan yet</div></div><div class="card"><div class="tiny">STUDY TIME TODAY</div><div class="metric" id="hTime">0m</div><div class="tiny">Stopwatch records</div></div><div class="card"><div class="tiny">SYLLABUS COMPLETED</div><div class="metric" id="hPct">0%</div><div class="progress"><span id="hBar" style="width:0%"></span></div></div><div class="card"><div class="tiny">TODAY'S RESULT</div><div class="metric" id="hResult">—</div><div class="tiny">Completed tasks only</div></div></div><div class="row"><h2>Today's tasks</h2><button class="alt" onclick="go('plan')">Open plan</button></div><div class="card" id="hTaskList"><div class="empty">Your plan will appear here.</div></div></section>
 <section id="goal" class="screen"><h1>Main Goal</h1><p class="muted">Separate subject tabs with individual syllabus and chapter targets.</p><div class="card form"><div class="full"><label>Goal / exam name</label><input id="goalName" placeholder="e.g. SSC CGL 2027"></div><div><label>Exam date</label><input type="date" id="goalDate"></div><div style="display:flex;align-items:end"><button style="width:100%" onclick="saveGoal()">Save goal</button></div></div><div class="subject-tabs" id="tabs"></div><div class="card"><div class="row"><div><h2 id="sHeading">Subject</h2><div class="tiny" id="sStats">0 chapters</div></div><button onclick="addChapter()">+ Chapter</button></div><div class="form" style="margin:12px 0"><div><label>Subject target date</label><input type="date" id="sDate"></div><div style="display:flex;align-items:end"><button class="alt" style="width:100%" onclick="saveSDate()">Save date</button></div></div><div id="chapters"></div><div style="margin-top:16px"><h3>Bulk add chapters</h3><div class="tiny" style="margin-bottom:7px">Enter one chapter per line. Paste a list to add them all at once.</div><textarea id="bulkChapters" rows="5" placeholder="Number System&#10;Algebra&#10;Geometry&#10;Trigonometry" style="width:100%;resize:vertical;background:#0d1726;color:var(--t);border:1px solid var(--line);border-radius:10px;padding:11px"></textarea><button style="margin-top:8px" onclick="addBulkChapters()">Add all chapters</button></div></div><div class="card"><h3>Add a subject</h3><div class="row"><input id="newSubject" placeholder="e.g. General Awareness"><button onclick="addSubject()">Add</button></div></div></section>
-<section id="plan" class="screen"><h1>Daily Plan</h1><p class="muted">Generate suggestions each morning, edit, then confirm.</p><div class="card"><div class="row"><div><div class="tiny">TODAY</div><strong id="planDate"></strong></div><button class="alt" onclick="generatePlan()">↻ Generate</button></div><div class="grid" style="margin-top:12px"><div><div class="tiny">TASKS</div><div class="metric" id="pCount">0</div></div><div><div class="tiny">COMPLETED</div><div class="metric" id="pDone">0 / 0</div></div></div><div style="margin-top:14px"><label>Planned study time (total)</label><div class="metric" id="dailyPlanTotal">0h 0m</div><div class="tiny" style="margin-top:5px">Automatically calculated from all task durations.</div></div></div><div class="card"><h2>Today's tasks</h2><div id="tasks"><div class="empty">Generate a plan to start.</div></div><div class="row wrap" style="margin-top:12px"><button onclick="confirmPlan()">Confirm today's plan</button><button class="alt" onclick="addTask()">+ Add task</button></div></div><div class="card"><h2>Add online class for today</h2><p class="tiny">Add a class whenever you have one. It will appear immediately in the Study tab.</p><div class="form"><div class="full"><label>Class name / topic</label><input id="className" placeholder="e.g. Mathematics live class"></div><div><label>Subject</label><select id="classSubject"></select></div><div><label>Duration (minutes)</label><input id="classDuration" type="number" min="1" max="1440" value="90"></div><div class="full"><button style="width:100%" onclick="addClass()">+ Add today's online class</button></div>
-<div class="full"><button class="alt" style="width:100%" onclick="addDefaultOnlineClasses()">＋ Add 4 Default Classes</button></div></div><div id="classList" class="tiny" style="margin-top:12px"></div></div></section>
+<section id="plan" class="screen"><h1>Daily Plan</h1><p class="muted">Generate suggestions each morning, edit, then confirm.</p><div class="card"><div class="row"><div><div class="tiny">TODAY</div><strong id="planDate"></strong></div><button class="alt" onclick="generatePlan()">↻ Generate</button></div><div class="grid" style="margin-top:12px"><div><div class="tiny">TASKS</div><div class="metric" id="pCount">0</div></div><div><div class="tiny">COMPLETED</div><div class="metric" id="pDone">0 / 0</div></div></div><div style="margin-top:14px"><label>Planned study time (total)</label><div class="metric" id="dailyPlanTotal">0h 0m</div><div class="tiny" style="margin-top:5px">Automatically calculated from all task durations.</div></div></div><div class="card"><h2>Today's tasks</h2><div id="tasks"><div class="empty">Generate a plan to start.</div></div><div class="row wrap" style="margin-top:12px"><button onclick="confirmPlan()">Confirm today's plan</button><button class="alt" onclick="openTaskModal()">+ Add task</button></div></div><div class="card"><div class="row"><h2>Add online class for today</h2><button class="alt" type="button" title="Add missing default classes" aria-label="Add missing default classes" onclick="addDefaultOnlineClasses()" style="width:42px;height:42px;padding:0;font-size:23px;flex:0 0 42px">＋</button></div><p class="tiny">Add a class whenever you have one. It will appear immediately in the Study tab.</p><div class="form"><div class="full"><label>Class name / topic</label><input id="className" placeholder="e.g. Mathematics live class"></div><div><label>Subject</label><select id="classSubject"></select></div><div><label>Duration (minutes)</label><input id="classDuration" type="number" min="1" max="1440" value="90"></div><div class="full"><button style="width:100%" onclick="addClass()">+ Add today's online class</button></div></div><div id="classList" class="tiny" style="margin-top:12px"></div></div></section>
 <section id="study" class="screen"><h1>Study</h1><div class="card"><div class="row"><h2>Today's Tasks</h2><span class="tiny" id="studyTaskCount">0 tasks</span></div><div id="studyTaskList"><div class="empty">No tasks planned.</div></div></div><div class="card"><div class="row"><h2>Online Classes</h2><span class="tiny">Daily classes</span></div><div id="onlineClassStudyList"></div></div><div class="card" id="activeStudyCard" style="display:none"><div class="tiny">ACTIVE SESSION</div><h2 id="activeTaskTitle">Study session</h2><div class="tiny" id="activeTaskMode">Self Study</div><div class="timer"><div class="time" id="taskClock">00:00:00</div><div class="tiny" id="taskTimerState">Session running</div><div class="row" style="justify-content:center;margin-top:16px"><button class="alt" id="taskPause" onclick="pauseTaskSession()">Ⅱ Pause</button><button class="red" onclick="completeTaskSession()">✓ Complete</button></div></div></div><div class="grid"><div class="card"><h2>Today's recorded time</h2><div class="metric" id="todayTime">0m</div></div><div class="card"><h2>Extra study</h2><div class="metric" id="extraToday">0m</div><div class="tiny">Time beyond planned task duration</div></div></div><div class="card"><h2>Recent sessions</h2><div id="sessions" class="tiny">No sessions yet.</div></div></section>
 <section id="calendar" class="screen"><h1>Calendar</h1><p class="muted">Green tick = all tasks completed. Red cross = incomplete or no plan.</p><div class="card"><div class="row"><button class="alt" onclick="month(-1)">‹</button><h2 id="monthName" style="margin:0"></h2><button class="alt" onclick="month(1)">›</button></div><div class="cal" id="calGrid" style="margin-top:12px"></div></div><div class="card" id="dayInfo"><div class="empty">Select a date to view its record.</div></div></section>
 <section id="progress" class="screen"><h1>Progress</h1><p class="muted">Overall and subject-wise performance.</p><div class="grid"><div class="card"><div class="tiny">SYLLABUS</div><div class="metric" id="prPct">0%</div></div><div class="card"><div class="tiny">TOTAL STUDY TIME</div><div class="metric" id="prTime">0m</div></div><div class="card"><div class="tiny">CHAPTERS DONE</div><div class="metric" id="prCh">0 / 0</div></div><div class="card"><div class="tiny">DAYS COMPLETED</div><div class="metric" id="prDays">0</div></div></div><div class="card"><h2>Subject progress</h2><div id="subjectProgress"></div></div><div class="card"><h2>Backup</h2><p class="tiny">Data is stored on this device. Export a backup regularly.</p><div class="row wrap"><button onclick="backup()">Export backup</button><button class="alt" onclick="importBackup()">Import backup</button><input id="backupFileInput" type="file" accept="application/json,.json" onchange="restore(event)" style="display:none"></div></div></section></div><div class="toast" id="toast"></div>
+
+<div id="taskModal" class="modal" style="display:none;position:fixed;inset:0;background:#000b;z-index:20;align-items:center;justify-content:center;padding:18px">
+ <div class="card" style="width:100%;max-width:520px;max-height:88vh;overflow:auto;margin:0;background:var(--p)">
+  <div class="row"><h2 style="margin:0">Add task</h2><button class="alt" onclick="closeTaskModal()">✕</button></div>
+  <div class="form" style="margin-top:14px">
+   <div class="full"><label for="newTaskTitle">Task name</label><input id="newTaskTitle" placeholder="Write task name (optional if topic selected)"></div>
+   <div class="full"><label for="newTaskSubject">Subject from Goal</label><select id="newTaskSubject" onchange="taskModalSubjectChanged()"></select></div>
+   <div class="full"><label for="newTaskChapter">Chapter</label><select id="newTaskChapter" onchange="taskModalChapterChanged()"></select></div>
+   <div class="full"><label for="newTaskTopic">Topic</label><select id="newTaskTopic" onchange="taskModalTopicChanged()"></select></div>
+   <div><label for="newTaskDuration">Duration (minutes)</label><input id="newTaskDuration" type="number" min="1" max="1440" value="60"></div>
+   <div><label for="newTaskSlot">Time</label><select id="newTaskSlot"><option>Morning</option><option>Afternoon</option><option>Night</option></select></div>
+   <div class="full tiny">Subjects, chapters and topics are loaded from your Goal tab. You can also type a custom task name.</div>
+   <div class="full grid" style="grid-template-columns:1fr 1fr"><button class="alt" onclick="closeTaskModal()">Cancel</button><button onclick="saveTaskFromModal()">Add task</button></div>
+  </div>
+ </div>
+</div>
 <script>
 const KEY='vector_data_v1',today=()=>{let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},defaults=()=>({goal:{name:'',date:''},subjects:[{id:'m',name:'Maths',date:'',chapters:[]},{id:'e',name:'English',date:'',chapters:[]},{id:'r',name:'Reasoning',date:'',chapters:[]},{id:'g',name:'General Awareness',date:'',chapters:[]}],selected:'m',plans:{},classes:[],onlineClasses:[],sessions:[]});let D;try{D=JSON.parse(localStorage.getItem(KEY))||defaults()}catch{D=defaults()}if(!Array.isArray(D.onlineClasses))D.onlineClasses=[];
 /* V3 migration: add each required daily class individually.
    Existing manually-added classes are preserved; defaults are seeded only once. */
 if(!D._onlineDefaultsSeededV3){
  const defs=[
-  {key:'english',subject:'English',title:'Live Class',duration:90},
-  {key:'maths',subject:'Maths',title:'Live Class',duration:90},
-  {key:'reasoning',subject:'Reasoning',title:'Live Class',duration:60},
-  {key:'english-vocabulary',subject:'English',title:'Vocabulary',duration:30}
+  {key:'english',subject:'English',title:'English',duration:90},
+  {key:'maths',subject:'Maths',title:'Maths',duration:90},
+  {key:'reasoning',subject:'Reasoning',title:'Reasoning',duration:60},
+  {key:'english-vocabulary',subject:'English',title:'English Vocabulary',duration:30}
  ];
  const norm=v=>String(v||'').trim().toLowerCase();
  defs.forEach((x,i)=>{
@@ -200,12 +215,84 @@ let todaysClasses=(D.classes||[]).filter(c=>c.day===day);
 todaysClasses.forEach(c=>{const classSlot=['Morning','Afternoon','Night'].includes(c.slot)?c.slot:'Afternoon';tasks.push({id:'t'+Date.now()+Math.random(),subjectId:c.subjectId,subject:c.subject,title:c.name,chapterId:'',topicId:'',duration:Number(c.duration)||60,status:'pending',type:'class',slot:classSlot})});
 D.plans[key]={tasks,confirmed:false,generatedBy:'mission-govt-job-2027',routineVersion:'user-confirmed-morning-afternoon-night-v2',scheduleDay:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][day]};
 persist();note('7-day study plan generated')}
-function addTask(){if(!D.subjects.length){note('Add a subject first');return}let s=subject(),title=prompt('Task or chapter name?');if(!title)return;let mins=Number(prompt('Planned minutes?','60'));if(!Number.isInteger(mins)||mins<1||mins>1440){note('Enter 1 to 1440 minutes');return}let choice=prompt('Add to which time?\\n1. Morning\\n2. Afternoon\\n3. Night\\n4. Random','1');if(choice===null)return;let slots=['Morning','Afternoon','Night'],slot=choice==='4'?slots[Math.floor(Math.random()*3)]:slots[Number(choice)-1];if(!slot){note('Choose 1, 2, 3 or 4');return}D.plans[today()]??={tasks:[],confirmed:false};D.plans[today()].tasks.push({id:'t'+Date.now(),subjectId:s.id,subject:s.name,title,duration:mins,status:'pending',type:'custom',slot});persist();note('Task added to '+slot)}function removeTask(id){let p=D.plans[today()];if(!p)return;p.tasks=p.tasks.filter(t=>t.id!==id);persist();note('Task removed')}
+function openTaskModal(){
+ if(!D.subjects.length){note('Add a subject in Goal first');return}
+ $('newTaskTitle').value='';
+ $('newTaskDuration').value='60';
+ $('newTaskSlot').value='Morning';
+ $('newTaskSubject').innerHTML=D.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ const preferred=D.subjects.find(s=>s.id===D.selected)?D.selected:D.subjects[0].id;
+ $('newTaskSubject').value=preferred;
+ taskModalSubjectChanged();
+ $('taskModal').style.display='flex';
+}
+function closeTaskModal(){$('taskModal').style.display='none'}
+function taskModalSubjectChanged(){
+ const s=D.subjects.find(x=>x.id===$('newTaskSubject').value);
+ $('newTaskChapter').innerHTML='<option value="">No chapter selected</option>'+(s?.chapters||[]).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ taskModalChapterChanged();
+}
+function taskModalChapterChanged(){
+ const s=D.subjects.find(x=>x.id===$('newTaskSubject').value);
+ const c=s?.chapters?.find(x=>x.id===$('newTaskChapter').value);
+ $('newTaskTopic').innerHTML='<option value="">No topic selected</option>'+(c?.topics||[]).map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
+}
+function taskModalTopicChanged(){
+ const s=D.subjects.find(x=>x.id===$('newTaskSubject').value);
+ const c=s?.chapters?.find(x=>x.id===$('newTaskChapter').value);
+ const t=c?.topics?.find(x=>x.id===$('newTaskTopic').value);
+ if(t && !$('newTaskTitle').value.trim())$('newTaskTitle').value=t.name;
+}
+function saveTaskFromModal(){
+ const s=D.subjects.find(x=>x.id===$('newTaskSubject').value);
+ const c=s?.chapters?.find(x=>x.id===$('newTaskChapter').value);
+ const topic=c?.topics?.find(x=>x.id===$('newTaskTopic').value);
+ const title=$('newTaskTitle').value.trim()||topic?.name||c?.name;
+ const mins=Number($('newTaskDuration').value);
+ const slot=$('newTaskSlot').value;
+ if(!s){note('Select a subject');return}
+ if(!title){note('Write a task name or select a chapter/topic');return}
+ if(!Number.isInteger(mins)||mins<1||mins>1440){note('Enter 1 to 1440 minutes');return}
+ if(!['Morning','Afternoon','Night'].includes(slot)){note('Select a valid time');return}
+ D.plans[today()]??={tasks:[],confirmed:false};
+ D.plans[today()].tasks.push({
+  id:'t'+Date.now()+Math.random(),subjectId:s.id,subject:s.name,
+  chapterId:c?.id||'',topicId:topic?.id||'',title,
+  duration:mins,status:'pending',type:'custom',slot
+ });
+ persist();closeTaskModal();note('Task added to '+slot);
+ if(typeof render==='function')render();
+}
+function addTask(){openTaskModal()}
+function removeTask(id){let p=D.plans[today()];if(!p)return;p.tasks=p.tasks.filter(t=>t.id!==id);persist();note('Task removed')}
 function changeTaskTopic(taskId,topicId){let t=D.plans[today()]?.tasks.find(x=>x.id===taskId);if(!t)return;let s=D.subjects.find(x=>x.id===t.subjectId),c=s?.chapters.find(x=>x.id===t.chapterId),topic=c?.topics?.find(x=>x.id===topicId);if(!topic)return;t.topicId=topic.id;t.title=topic.name;persist();note('Topic updated')}
 function plannedMinutes(){return (D.plans[today()]?.tasks||[]).reduce((sum,t)=>sum+(Number(t.duration)||0),0)}
 function plannedTimeLabel(){let total=plannedMinutes(),h=Math.floor(total/60),m=total%60;return h+'h '+m+'m'}
 function saveTaskDuration(id,v){let t=D.plans[today()]?.tasks.find(x=>x.id===id),n=Math.floor(Number(v));if(!t)return;if(!n||n<1||n>1440){note('Enter 1 to 1440 minutes');renderPlan();return}t.duration=n;persist();note('Task duration updated')}function taskStatus(id,v){let t=D.plans[today()]?.tasks.find(t=>t.id===id);if(!t)return;t.status=v;if(t.chapterId){let s=D.subjects.find(s=>s.id===t.subjectId),c=s?.chapters.find(c=>c.id===t.chapterId);if(c&&t.topicId){let tp=(c.topics||[]).find(x=>x.id===t.topicId);if(tp)tp.done=(v==='done');c.done=(c.topics||[]).length>0&&c.topics.every(x=>x.done)}else if(c)c.done=(v==='done')}persist()}
-function undoTaskCompletion(id){let t=D.plans[today()]?.tasks.find(x=>x.id===id);if(!t||t.status!=='done')return;t.status='pending';if(t.chapterId){let s=D.subjects.find(x=>x.id===t.subjectId),c=s?.chapters.find(x=>x.id===t.chapterId);if(c&&t.topicId){let tp=(c.topics||[]).find(x=>x.id===t.topicId);if(tp)tp.done=false;c.done=false}else if(c)c.done=false}persist();note('Completion undone — task is Pending')}function confirmPlan(){let p=D.plans[today()];if(!p?.tasks.length){note('Generate or add tasks first');return}p.confirmed=true;persist();note('Plan confirmed')}function addClass(){
+function undoTaskCompletion(id){let t=D.plans[today()]?.tasks.find(x=>x.id===id);if(!t||t.status!=='done')return;t.status='pending';if(t.chapterId){let s=D.subjects.find(x=>x.id===t.subjectId),c=s?.chapters.find(x=>x.id===t.chapterId);if(c&&t.topicId){let tp=(c.topics||[]).find(x=>x.id===t.topicId);if(tp)tp.done=false;c.done=false}else if(c)c.done=false}persist();note('Completion undone — task is Pending')}function confirmPlan(){let p=D.plans[today()];if(!p?.tasks.length){note('Generate or add tasks first');return}p.confirmed=true;persist();note('Plan confirmed')}function addDefaultOnlineClasses(){
+ const defs=[
+  {key:'english',subject:'English',title:'English',duration:90},
+  {key:'maths',subject:'Maths',title:'Maths',duration:90},
+  {key:'reasoning',subject:'Reasoning',title:'Reasoning',duration:60},
+  {key:'english-vocabulary',subject:'English',title:'English Vocabulary',duration:30}
+ ];
+ const norm=v=>String(v||'').trim().toLowerCase();
+ let added=0;
+ defs.forEach(x=>{
+  const exists=(D.onlineClasses||[]).some(c=>c.defaultKey===x.key);
+  if(exists)return;
+  const sub=(D.subjects||[]).find(z=>norm(z.name)===norm(x.subject));
+  D.onlineClasses.push({
+   id:'default-online-'+x.key+'-'+Date.now()+Math.random().toString(16).slice(2),
+   defaultKey:x.key,subjectId:sub?.id||'',subject:x.subject,title:x.title,
+   duration:x.duration,completedDates:[],isDefault:true
+  });
+  added++;
+ });
+ persist();
+ note(added?added+' default class(es) added':'All default classes are already added');
+}
+function addClass(){
  const name=String($('className')?.value||'').trim();
  if(!name){note('Enter class name or topic');$('className')?.focus();return}
  if(!Array.isArray(D.onlineClasses))D.onlineClasses=[];
@@ -219,35 +306,6 @@ function undoTaskCompletion(id){let t=D.plans[today()]?.tasks.find(x=>x.id===id)
  localStorage.setItem(KEY,JSON.stringify(D));
  render();
  note('Online class added to Study tab');
-}
-function addDefaultOnlineClasses(){
- if(!Array.isArray(D.onlineClasses))D.onlineClasses=[];
- const defs=[
-  {key:'default-english',subject:'English',title:'English Class',duration:90},
-  {key:'default-maths',subject:'Maths',title:'Maths Class',duration:90},
-  {key:'default-reasoning',subject:'Reasoning',title:'Reasoning Class',duration:60},
-  {key:'default-english-vocabulary',subject:'English',title:'English Vocabulary',duration:30}
- ];
- const norm=v=>String(v||'').trim().toLowerCase();
- let added=0;
- defs.forEach(x=>{
-  const exists=D.onlineClasses.some(c=>
-   c.defaultKey===x.key ||
-   (c.isDefault && norm(c.subject)===norm(x.subject) && norm(c.title)===norm(x.title))
-  );
-  if(exists)return;
-  const sub=(D.subjects||[]).find(s=>norm(s.name)===norm(x.subject));
-  if(!sub)return;
-  D.onlineClasses.push({
-   id:'oc-'+x.key+'-'+Date.now()+'-'+Math.random().toString(16).slice(2),
-   defaultKey:x.key,subjectId:sub.id,subject:sub.name,title:x.title,
-   duration:x.duration,completedDates:[],isDefault:true
-  });
-  added++;
- });
- persist();
- render();
- note(added ? added+' default online classes added to Study tab' : 'All 4 default classes are already added');
 }
 function delClass(id){D.onlineClasses=(D.onlineClasses||[]).filter(x=>x.id!==id);persist();note('Online class removed')}
 
