@@ -1,18 +1,21 @@
 package com.mobashir.vector;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
 public class PlayerActivity extends Activity {
@@ -29,44 +32,54 @@ public class PlayerActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         videoUrl = getIntent().getStringExtra(EXTRA_VIDEO_URL);
-        String videoTitle = getIntent().getStringExtra(EXTRA_VIDEO_TITLE);
-
         if (videoUrl == null || videoUrl.trim().isEmpty()) {
             Toast.makeText(this, "Video link missing", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
-        getWindow().setStatusBarColor(Color.rgb(11, 18, 32));
+        // Video player opens in landscape fullscreen.
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setStatusBarColor(Color.BLACK);
         getWindow().setNavigationBarColor(Color.BLACK);
+        hideSystemBars();
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(11, 18, 32));
-
-        TextView titleView = new TextView(this);
-        titleView.setText(videoTitle == null || videoTitle.trim().isEmpty()
-                ? "VECTOR Player" : videoTitle);
-        titleView.setTextColor(Color.WHITE);
-        titleView.setTextSize(16);
-        titleView.setGravity(Gravity.CENTER_VERTICAL);
-        titleView.setPadding(16, 12, 16, 12);
-        root.addView(titleView, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.BLACK);
 
         playerView = new PlayerView(this);
         playerView.setUseController(true);
         playerView.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS);
         playerView.setKeepContentOnPlayerReset(true);
+        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         playerView.setBackgroundColor(Color.BLACK);
+        playerView.setControllerShowTimeoutMs(3000);
+        playerView.setControllerHideOnTouch(true);
 
-        LinearLayout.LayoutParams playerParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, 0);
-        playerParams.weight = 1;
-        root.addView(playerView, playerParams);
-
+        root.addView(playerView, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
+
+        // Re-hide system bars after the user exits transient immersive mode.
+        root.setOnSystemUiVisibilityChangeListener(visibility -> {
+            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                hideSystemBars();
+            }
+        });
+    }
+
+    private void hideSystemBars() {
+        View decor = getWindow().getDecorView();
+        decor.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
 
     @Override
@@ -80,7 +93,6 @@ public class PlayerActivity extends Activity {
 
         player = new ExoPlayer.Builder(this).build();
         playerView.setPlayer(player);
-
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException error) {
@@ -90,8 +102,7 @@ public class PlayerActivity extends Activity {
             }
         });
 
-        MediaItem mediaItem = MediaItem.fromUri(videoUrl);
-        player.setMediaItem(mediaItem);
+        player.setMediaItem(MediaItem.fromUri(videoUrl));
         player.prepare();
         player.play();
     }
@@ -100,6 +111,12 @@ public class PlayerActivity extends Activity {
     protected void onStop() {
         super.onStop();
         releasePlayer();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) hideSystemBars();
     }
 
     private void releasePlayer() {
