@@ -69,10 +69,8 @@ public class MainActivity extends Activity {
 
 
     /**
-     * Routes Android intent:// links (for example Internet Download Manager)
-     * to their installed app. HLS .m3u8 links are opened in an external
-     * compatible video player because the WebView HTML5 player does not
-     * reliably support HLS on all Android devices.
+     * Routes intent:// links to their installed apps, PDF links to an external
+     * PDF viewer, and HLS .m3u8 links to a compatible external video player.
      */
     private boolean handleExternalUrl(String url) {
         if (url == null) return false;
@@ -95,6 +93,28 @@ public class MainActivity extends Activity {
 
             Uri uri = Uri.parse(url);
             String path = uri.getPath();
+            String lowerPath = path == null ? "" : path.toLowerCase();
+
+            // Open PDF documents in an installed PDF viewer instead of WebView,
+            // which does not reliably render PDF files directly.
+            if (lowerPath.endsWith(".pdf") || lowerPath.contains(".pdf/")) {
+                Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
+                pdfIntent.setDataAndType(uri, "application/pdf");
+                pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    startActivity(Intent.createChooser(pdfIntent, "Open PDF with"));
+                } catch (ActivityNotFoundException e) {
+                    try {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+                        browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(browserIntent);
+                    } catch (ActivityNotFoundException ignored) {
+                        Toast.makeText(this, "No PDF viewer found. Please install a PDF reader.", Toast.LENGTH_LONG).show();
+                    }
+                }
+                return true;
+            }
+
             if (path != null && path.toLowerCase().contains(".m3u8")) {
                 Intent videoIntent = new Intent(Intent.ACTION_VIEW);
                 videoIntent.setDataAndType(uri, "video/*");
