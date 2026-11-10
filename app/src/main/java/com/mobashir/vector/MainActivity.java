@@ -9,7 +9,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
+import android.os.Build;
 import android.widget.Toast;
+import android.content.ActivityNotFoundException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -44,11 +47,76 @@ public class MainActivity extends Activity {
         settings.setSupportMultipleWindows(false);
 
         webView.addJavascriptInterface(new BackupBridge(), "Android");
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return handleExternalUrl(url);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    return handleExternalUrl(request.getUrl().toString());
+                }
+                return false;
+            }
+        });
         webView.setWebChromeClient(new WebChromeClient());
 
         setContentView(webView);
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+
+    /**
+     * Routes Android intent:// links (for example Internet Download Manager)
+     * to their installed app. HLS .m3u8 links are opened in an external
+     * compatible video player because the WebView HTML5 player does not
+     * reliably support HLS on all Android devices.
+     */
+    private boolean handleExternalUrl(String url) {
+        if (url == null) return false;
+
+        try {
+            if (url.startsWith("intent:")) {
+                Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    String fallback = intent.getStringExtra("browser_fallback_url");
+                    if (fallback != null && !fallback.isEmpty()) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fallback)));
+                    } else {
+                        Toast.makeText(this, "Required app is not installed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return true;
+            }
+
+            Uri uri = Uri.parse(url);
+            String path = uri.getPath();
+            if (path != null && path.toLowerCase().contains(".m3u8")) {
+                Intent videoIntent = new Intent(Intent.ACTION_VIEW);
+                videoIntent.setDataAndType(uri, "video/*");
+                videoIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    startActivity(videoIntent);
+                } catch (ActivityNotFoundException e) {
+                    // Some players register HLS as a generic URL rather than video/*.
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    } catch (ActivityNotFoundException ignored) {
+                        Toast.makeText(this, "No compatible video player found", Toast.LENGTH_LONG).show();
+                    }
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Unable to open link", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
     }
 
     private class BackupBridge {
