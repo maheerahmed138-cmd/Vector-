@@ -14,3 +14,10 @@ android {
         versionName '1.0'
     }
 }
+
+dependencies {
+    // Android Media3 ExoPlayer with HLS (.m3u8) streaming support
+    implementation 'androidx.media3:media3-exoplayer:1.5.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.5.1'
+    implementation 'androidx.media3:media3-ui:1.5.1'
+}
